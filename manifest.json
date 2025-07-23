@@ -1,0 +1,81 @@
+{
+  "name": "CARSWAG - Drift & Time Attack",
+  "short_name": "CARSWAG",
+  "description": "Aplikacja do głosowania na auta Drift i Time Attack oraz zarządzania turami przejazdowymi",
+  "start_url": "/?utm_source=pwa",
+  "gcm_sender_id": "505043025948",
+  "display": "standalone",
+  "prefer_related_applications": false,
+  "background_color": "#1f2937",
+  "theme_color": "#1f2937",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "pl",
+  "categories": ["sports", "entertainment"],
+  "icons": [
+    {
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Głosowanie",
+      "short_name": "Głosuj",
+      "description": "Przejdź do panelu głosowania",
+      "url": "/?view=voting",
+      "icons": [{ "src": "favicon-32x32.png", "sizes": "32x32", "type": "image/png" }]
+    },
+    {
+      "name": "Powiadomienia",
+      "short_name": "Powiadomienia",
+      "description": "Sprawdź powiadomienia",
+      "url": "/?view=notifications",
+      "icons": [{ "src": "favicon-32x32.png", "sizes": "32x32", "type": "image/png" }]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+name,email,role,vote_weight,skill_level,is_ready,avatar_url
+Jan Kowalski,jan.kowalski@example.com,user,1,,,
+Anna Nowak,anna.nowak@example.com,driver,5,basic,true,
+Piotr Wiśniewski,piotr.wisniewski@example.com,driver,5,medium,false,
+Maria Kowalczyk,maria.kowalczyk@example.com,user,1,,,
+Tomasz Zieliński,tomasz.zielinski@example.com,driver,5,advanced,true,
+Katarzyna Woźniak,katarzyna.wozniak@example.com,flag_manager,1,,,
+Michał Kamiński,michal.kaminski@example.com,user,1,,,
+Agnieszka Lewandowska,agnieszka.lewandowska@example.com,driver,5,basic,false,
+Paweł Dąbrowski,pawel.dabrowski@example.com,user,1,,,
+Magdalena Kozłowska,magdalena.kozlowska@example.com,driver,5,medium,true,

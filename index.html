@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>3UDAN'T BY CARSWAG</title>
+    <meta name="description" content="Aplikacja do głosowania na auta Drift i Time Attack oraz zarządzania turami przejazdowymi">
+    <meta name="keywords" content="drift, time attack, głosowanie, motorsport, zawody">
+    <meta property="og:title" content="Drift & Time Attack - Głosowanie">
+    <meta property="og:description" content="Aplikacja do głosowania na auta Drift i Time Attack">
+    <meta name="twitter:title" content="Drift & Time Attack - Głosowanie">
+    <meta name="twitter:description" content="Aplikacja do głosowania na auta Drift i Time Attack">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CARSWAG">
+    <meta name="apple-touch-fullscreen" content="yes">
+    
+    <!-- HTTPS/Security Meta Tags -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <!-- Pull-to-refresh support -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="msapplication-TileColor" content="#1f2937">
+    <meta name="theme-color" content="#1f2937">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1f2937">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#1f2937">
+    
+    <!-- iOS specific meta tags for status bar -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Firebase SDK -->
+    <script type="module" src="utils/firebase.js"></script>
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
+    <!-- Splash Screen CSS -->
+    <link rel="stylesheet" href="splash.css">
+    
+    <style>
+        /* Custom scrollbar styles */
+        .scrollbar-thin {
+            scrollbar-width: thin;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(55, 65, 81, 0.3);
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(107, 114, 128, 0.8);
+            border-radius: 3px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 114, 128, 1);
+        }
+    </style>
+
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+
+    <!-- Predefined Tailwind CSS, use it as needed, or update base on your -->
+    <style type="text/tailwindcss">
+    @layer theme {
+        :root {
+            --primary: #dc2626;
+            --secondary: #1f2937;
+            --accent: #f59e0b;
+        }
+    }
+
+    @layer base {
+        html {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            min-height: 100vh;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            /* Pull-to-refresh dla iOS i macOS PWA */
+            overscroll-behavior-y: none;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+            /* Zapobieganie białemu tłu na macOS PWA */
+            background-color: #1f2937 !important;
+        }
+        
+        #root {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            min-height: 100vh;
+        }
+    }
+
+    @layer components {
+        .btn-primary {
+            @apply bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+        }
+        .btn-secondary {
+            @apply bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+        }
+        .card {
+            @apply bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6;
+        }
+        .car-card {
+            @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-red-500/50 transition-all cursor-pointer;
+        }
+        .car-card.selected {
+            @apply border-red-500 bg-red-500/10;
+        }
+        .page-transition {
+            @apply transition-all duration-300 ease-in-out;
+        }
+        .page-enter {
+            @apply opacity-0 transform translate-y-4;
+        }
+        .page-enter-active {
+            @apply opacity-100 transform translate-y-0;
+        }
+        .nav-clicked {
+            @apply transform scale-95;
+            transition: transform 0.1s ease-out;
+        }
+        .swipe-notification {
+            @apply transition-transform duration-200 ease-out;
+        }
+        .swipe-notification.swiped {
+            @apply transform translate-x-full opacity-0;
+        }
+    }
+
+    @layer utilities {
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+    }
+    
+    /* Specjalne style dla PWA - zapobieganie białemu tłu */
+    @media (display-mode: standalone) {
+        html, body {
+            overscroll-behavior: none !important;
+            overscroll-behavior-y: none !important;
+            background-color: #1f2937 !important;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+        }
+        
+        /* Zapobieganie bounce effect na macOS - ale pozwalamy na wheel events */
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        #root {
+            height: 100vh;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+        }
+        
+        /* Dodatkowe zabezpieczenie przed białym tłem */
+        * {
+            overscroll-behavior: none !important;
+        }
+        
+        /* iOS specific fixes for status bar and safe areas */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+        
+        /* Ensure status bar area has correct background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: env(safe-area-inset-top);
+            background: #1f2937;
+            z-index: 9999;
+        }
+    }
+    
+    /* iOS Safari specific fixes */
+    @supports (-webkit-touch-callout: none) {
+        html, body {
+            background-color: #1f2937 !important;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+        }
+        
+        /* Fix for iOS status bar in PWA mode */
+        @media (display-mode: standalone) {
+            html {
+                background: #1f2937 !important;
+            }
+            
+            body {
+                background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+            }
+            
+            #root {
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+                background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+            }
+        }
+    }
+    </style>
+
+</head>
+<body>
+    <!-- PWA Splash Screen -->
+    <div id="pwa-splash" class="pwa-splash">
+        <img id="splash-logo" class="splash-logo" src="icon-512.png" alt="CARSWAG Logo">
+        <h1 class="splash-title">CARSWAG</h1>
+        <p class="splash-subtitle">Drift & Time Attack</p>
+        <div class="splash-loader"></div>
+        <div class="splash-progress">
+            <div class="splash-progress-bar"></div>
+        </div>
+    </div>
+    
+    <div id="root"></div>
+    <script type="text/babel" src="utils/supabase.js"></script>
+    <script type="text/babel" src="utils/secureSupabase.js"></script>
+    <script type="text/babel" src="utils/secureOperations.js"></script>
+    <script type="text/javascript" src="utils/cookies.js"></script>
+    <script src="utils/animations.js"></script>
+    <script type="text/babel" src="utils/auth.js"></script>
+    <script type="text/babel" src="utils/hasUserVoted.js"></script>
+    <script type="text/babel" src="components/Login.js"></script>
+    <script type="text/babel" src="components/Navigation.js"></script>
+    <script type="text/babel" src="components/VotingPanel.js"></script>
+    <script type="text/babel" src="components/CarCard.js"></script>
+    <script type="text/babel" src="components/NotificationPanel.js"></script>
+    <script type="text/babel" src="components/NotificationSettings.js"></script>
+    <script type="text/babel" src="components/DriverProfile.js"></script>
+    <script type="text/babel" src="components/Dashboard.js"></script>
+    <script type="text/babel" src="components/DriverPanel.js"></script>
+    <script type="text/babel" src="components/SessionStatistics.js"></script>
+    <script type="text/babel" src="components/FlagManager.js"></script>
+    <script type="text/babel" src="components/KaczkaPanel.js"></script>
+    <script type="text/babel" src="components/DriverRegistration.js"></script>
+    <script type="text/babel" src="components/AvatarUpload.js"></script>
+    <script type="text/babel" src="components/NotificationCenter.js"></script>
+    <script type="text/babel" src="components/BroadcastNotifications.js"></script>
+    <script type="text/javascript" src="components/AnimatedCard.js"></script>
+    <script type="text/babel" src="components/PWAInstallPrompt.js"></script>
+    <script type="text/babel" src="utils/pushNotifications.js"></script>
+    <script type=\"text/javascript\" src=\"tmp_rovodev_debug_firebase.js\"></script>
+    <script type=\"text/javascript\" src=\"tmp_rovodev_vapid_check.js\"></script>
+    <script type=\"text/javascript\" src=\"tmp_rovodev_final_test.js\"></script>
+    <script type="text/babel" src="utils/voteHourlySummary.js"></script>
+    <script src="debug.js"></script>
+    <script type="text/babel" src="app.js"></script>
+    
+    <!-- PWA Splash Screen Script -->
+    <script>
+      // PWA Splash Screen Manager
+      class SplashScreenManager {
+        constructor() {
+          this.splash = document.getElementById('pwa-splash');
+          this.logo = document.getElementById('splash-logo');
+          this.minDisplayTime = 2000; // Minimum 2 seconds
+          this.startTime = Date.now();
+          this.appReady = false;
+          this.init();
+        }
+
+        async init() {
+          // Load app logo from settings if available
+          await this.loadAppLogo();
+          
+          // Hide splash when app is ready and minimum time has passed
+          this.waitForApp();
+        }
+
+        async loadAppLogo() {
+          try {
+            // Try to get logo from app settings
+            if (window.supabase) {
+              const settings = await window.supabase.getAppSettings();
+              if (settings && settings.logo_url) {
+                this.logo.src = settings.logo_url;
+              }
+            }
+          } catch (error) {
+            console.log('Using default logo for splash screen');
+            // Keep default logo (icon-512.png)
+          }
+        }
+
+        waitForApp() {
+          const checkAppReady = () => {
+            // Check if React app is mounted
+            const root = document.getElementById('root');
+            const hasContent = root && root.children.length > 0;
+            
+            if (hasContent) {
+              this.appReady = true;
+              this.hideSplash();
+            } else {
+              // Check again in 100ms
+              setTimeout(checkAppReady, 100);
+            }
+          };
+
+          // Start checking after minimum display time
+          const elapsed = Date.now() - this.startTime;
+          const remainingTime = Math.max(0, this.minDisplayTime - elapsed);
+          
+          setTimeout(checkAppReady, remainingTime);
+        }
+
+        hideSplash() {
+          if (!this.splash) return;
+          
+          // Add fade out class
+          this.splash.classList.add('fade-out');
+          
+          // Remove splash element after animation
+          setTimeout(() => {
+            if (this.splash && this.splash.parentNode) {
+              this.splash.parentNode.removeChild(this.splash);
+            }
+          }, 800); // Match CSS transition duration
+        }
+      }
+
+      // Initialize splash screen when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          new SplashScreenManager();
+        });
+      } else {
+        new SplashScreenManager();
+      }
+    </script>
+    
+    <!-- PWA Installation Script -->
+    <script>
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        // Allow registration on HTTPS or localhost (for development)
+        const isSecure = location.protocol === 'https:' || 
+                        location.hostname === 'localhost' || 
+                        location.hostname === '127.0.0.1';
+        
+        if (isSecure) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+              .then(registration => {
+                console.log('SW registered: ', registration);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                  console.log('New service worker version available');
+                });
+              })
+              .catch(registrationError => {
+                console.warn('SW registration failed: ', registrationError);
+                // PWA will work without SW, just without offline capabilities
+              });
+          });
+        } else {
+          console.warn('Service Worker requires HTTPS in production or localhost for development');
+        }
+      } else {
+        console.warn('Service Worker not supported in this browser');
+      }
+
+      // PWA Install Prompt - now handled by React component
+      // This is kept for backwards compatibility and debugging
+
+      // PWA installation is now handled by the React component PWAInstallPrompt.js
+      console.log('PWA installation prompts are managed by React component');
+      
+      // Debug PWA readiness
+      setTimeout(() => {
+        console.log('=== PWA Debug Info ===');
+        console.log('Protocol:', location.protocol);
+        console.log('Hostname:', location.hostname);
+        console.log('Service Worker support:', 'serviceWorker' in navigator);
+        console.log('Manifest link:', document.querySelector('link[rel="manifest"]') ? 'Found' : 'Missing');
+        console.log('Display mode:', window.matchMedia('(display-mode: standalone)').matches ? 'Standalone' : 'Browser');
+        console.log('User Agent:', navigator.userAgent);
+        
+        // Check if beforeinstallprompt was fired
+        let promptFired = false;
+        window.addEventListener('beforeinstallprompt', () => {
+          promptFired = true;
+          console.log('✓ beforeinstallprompt event fired');
+        });
+        
+        setTimeout(() => {
+          if (!promptFired) {
+            console.log('❌ beforeinstallprompt event NOT fired after 5 seconds');
+            console.log('Possible reasons:');
+            console.log('- PWA already installed');
+            console.log('- PWA criteria not met');
+            console.log('- Browser doesn\'t support installation');
+            console.log('- Need user interaction first');
+          }
+        }, 5000);
+      }, 1000);
+      
+      // Global pull-to-refresh functionality - works on all pages except NotificationCenter
+      let startY = 0;
+      let currentY = 0;
+      let pullDistance = 0;
+      let isPulling = false;
+      let refreshThreshold = 80; // Zmniejszono próg dla lepszej responsywności
+      let pullStartTime = 0;
+      let isMouseDown = false;
+      let refreshIndicator = null;
+      
+      // Create refresh indicator
+      const createRefreshIndicator = () => {
+        if (refreshIndicator) return;
+        
+        refreshIndicator = document.createElement('div');
+        refreshIndicator.className = 'fixed top-0 left-0 right-0 bg-black text-white text-center py-3 font-bold transition-all duration-200';
+        refreshIndicator.style.zIndex = '999999'; // Nad wszystkim
+        refreshIndicator.style.transform = 'translateY(-100%)';
+        refreshIndicator.style.opacity = '0';
+        refreshIndicator.innerHTML = '<div class="icon-refresh-cw inline mr-2"></div><span>PRZECIĄGNIJ W DÓŁ</span>';
+        
+        // Bezpieczne dodanie do DOM
+        try {
+          if (document.body && document.body.appendChild) {
+            document.body.appendChild(refreshIndicator);
+          } else {
+            // Fallback - dodaj do root container
+            const rootContainer = document.getElementById('root') || document.documentElement;
+            rootContainer.appendChild(refreshIndicator);
+          }
+        } catch (appendError) {
+          console.warn('⚠️ Could not append refresh indicator:', appendError);
+        }
+      };
+      
+      // Update refresh indicator
+      const updateRefreshIndicator = (distance, active) => {
+        if (!refreshIndicator) return;
+        
+        const progress = Math.min(distance / refreshThreshold, 1);
+        const indicatorHeight = 60; // Wysokość indicatora
+        
+        // Indicator pojawia się od góry
+        refreshIndicator.style.transform = `translateY(${Math.min(distance - refreshThreshold, 0)}px)`;
+        refreshIndicator.style.opacity = progress;
+        
+        // Całą aplikację "ciągniemy" w dół jak w Instagramie
+        const appContainer = document.getElementById('root');
+        if (appContainer && distance > 0) {
+          const pullOffset = Math.min(distance * 0.5, indicatorHeight);
+          appContainer.style.transform = `translateY(${pullOffset}px)`;
+          appContainer.style.transition = 'none';
+        }
+        
+        const icon = refreshIndicator.querySelector('.icon-refresh-cw');
+        const text = refreshIndicator.querySelector('span');
+        
+        if (active) {
+          icon.classList.add('animate-spin');
+          text.textContent = 'ODŚWIEŻ';
+          refreshIndicator.style.backgroundColor = '#059669'; // Zielony gdy gotowy
+        } else {
+          icon.classList.remove('animate-spin');
+          text.textContent = 'PRZECIĄGNIJ W DÓŁ';
+          refreshIndicator.style.backgroundColor = '#000000'; // Czarny domyślnie
+        }
+      };
+      
+      // Remove refresh indicator
+      const removeRefreshIndicator = () => {
+        if (refreshIndicator) {
+          refreshIndicator.remove();
+          refreshIndicator = null;
+        }
+        
+        // Resetuj pozycję aplikacji
+        const appContainer = document.getElementById('root');
+        if (appContainer) {
+          appContainer.style.transform = '';
+          appContainer.style.transition = 'transform 0.3s ease-out';
+          
+          // Usuń transition po animacji
+          setTimeout(() => {
+            appContainer.style.transition = '';
+          }, 300);
+        }
+      };
+      
+      // Check if we're in NotificationCenter (skip global pull-to-refresh)
+      const isInNotificationCenter = () => {
+        return document.querySelector('[data-name="notification-center"]') !== null;
+      };
+      
+      // Touch events for mobile
+      document.addEventListener('touchstart', (e) => {
+        if (isInNotificationCenter()) return; // Skip if in NotificationCenter
+        
+        if (window.scrollY === 0 && e.touches[0].clientY < window.innerHeight * 0.3) {
+          startY = e.touches[0].clientY;
+          pullStartTime = Date.now();
+          isPulling = true;
+          createRefreshIndicator();
+        }
+      }, { passive: true });
+      
+      document.addEventListener('touchmove', (e) => {
+        if (!isPulling || isInNotificationCenter()) return;
+        
+        currentY = e.touches[0].clientY;
+        pullDistance = Math.max(0, currentY - startY);
+        
+        if (pullDistance > 0 && window.scrollY === 0) {
+          e.preventDefault();
+          updateRefreshIndicator(pullDistance, pullDistance > refreshThreshold);
+        }
+      }, { passive: false });
+      
+      document.addEventListener('touchend', () => {
+        if (!isPulling || isInNotificationCenter()) return;
+        
+        if (pullDistance > refreshThreshold) {
+          updateRefreshIndicator(pullDistance, true);
+          setTimeout(() => {
+            window.location.reload();
+          }, 300);
+        } else {
+          removeRefreshIndicator();
+        }
+        
+        isPulling = false;
+        pullDistance = 0;
+        pullStartTime = 0;
+      }, { passive: true });
+      
+      // Mouse events for desktop PWA
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+      const isMacOS = navigator.platform.indexOf('Mac') > -1 || navigator.userAgent.indexOf('Mac') > -1;
+      
+      // Debug info
+      console.log('🔍 PWA Detection:', {
+        isPWA: isPWA,
+        isMacOS: isMacOS,
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        displayMode: window.matchMedia('(display-mode: standalone)').matches
+      });
+      
+      // Specjalna obsługa dla macOS PWA
+      if (isPWA && isMacOS) {
+        console.log('🍎 Detected macOS PWA - enabling enhanced pull-to-refresh');
+        
+        // Dodatkowe zabezpieczenia dla macOS
+        document.documentElement.style.overscrollBehavior = 'none';
+        document.body.style.overscrollBehavior = 'none';
+        
+        // Obsługa wheel event dla macOS (trackpad) - bardziej agresywna
+        const handleMacOSWheel = (e) => {
+          console.log('🔄 macOS wheel event:', e.deltaY, 'scrollY:', window.scrollY);
+          
+          if (isInNotificationCenter()) return;
+          
+          // Sprawdź czy jesteśmy na samej górze i scrollujemy w górę
+          if (window.scrollY <= 5 && e.deltaY < -5) {
+            console.log('🍎 macOS pull-to-refresh triggered!');
+            
+            const wheelDistance = Math.abs(e.deltaY) * 3; // Jeszcze większa czułość
+            
+            if (!isPulling) {
+              isPulling = true;
+              startY = 0;
+              pullDistance = 0;
+              createRefreshIndicator();
+              console.log('🚀 Starting pull gesture');
+            }
+            
+            pullDistance += wheelDistance;
+            console.log('📏 Pull distance:', pullDistance, 'threshold:', refreshThreshold);
+            updateRefreshIndicator(pullDistance, pullDistance > refreshThreshold);
+            
+            // Zapobieganie domyślnemu zachowaniu
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Auto-reset po 300ms bez aktywności (szybciej)
+            clearTimeout(window.wheelResetTimeout);
+            window.wheelResetTimeout = setTimeout(() => {
+              console.log('⏰ Wheel timeout - checking if should refresh');
+              if (pullDistance > refreshThreshold) {
+                console.log('✅ Refreshing!');
+                updateRefreshIndicator(pullDistance, true);
+                setTimeout(() => {
+                  window.location.reload();
+                }, 300);
+              } else {
+                console.log('❌ Not enough pull distance');
+                removeRefreshIndicator();
+              }
+              isPulling = false;
+              pullDistance = 0;
+            }, 300);
+          }
+        };
+        
+        // Dodaj event listener z capture=true dla lepszego przechwytywania
+        document.addEventListener('wheel', handleMacOSWheel, { passive: false, capture: true });
+        window.addEventListener('wheel', handleMacOSWheel, { passive: false, capture: true });
+      }
+      
+      if (isPWA) {
+        document.addEventListener('mousedown', (e) => {
+          if (isInNotificationCenter()) return;
+          
+          if (window.scrollY === 0) {
+            isMouseDown = true;
+            startY = e.clientY;
+            pullStartTime = Date.now();
+            createRefreshIndicator();
+            document.body.style.userSelect = 'none';
+          }
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+          if (!isMouseDown || isInNotificationCenter()) return;
+          
+          currentY = e.clientY;
+          pullDistance = Math.max(0, currentY - startY);
+          
+          if (pullDistance > 0 && window.scrollY === 0) {
+            e.preventDefault();
+            updateRefreshIndicator(pullDistance, pullDistance > refreshThreshold);
+          }
+        });
+        
+        document.addEventListener('mouseup', () => {
+          if (!isMouseDown || isInNotificationCenter()) return;
+          
+          if (pullDistance > refreshThreshold) {
+            updateRefreshIndicator(pullDistance, true);
+            setTimeout(() => {
+              window.location.reload();
+            }, 300);
+          } else {
+            removeRefreshIndicator();
+          }
+          
+          isMouseDown = false;
+          pullDistance = 0;
+          pullStartTime = 0;
+          document.body.style.userSelect = '';
+        });
+        
+        // Keyboard shortcut for desktop PWA
+        document.addEventListener('keydown', (e) => {
+          if (isInNotificationCenter()) return;
+          
+          if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+            e.preventDefault();
+            window.location.reload();
+          }
+        });
+      }
+    </script>
+</body>
+</html>
